@@ -184,6 +184,7 @@ func handleOAuth2Callback(f *oauth2.Config, ctx *macaron.Context, s session.Stor
 	}
 	// Store the credentials in the session.
 	val, _ := json.Marshal(t)
+	fmt.Println(val)
 	s.Set(KEY_TOKEN, val)
 	ctx.Redirect(next)
 }
