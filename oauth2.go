@@ -208,7 +208,17 @@ func handleOAuth2Callback(f *oauth2.Config, ctx *macaron.Context, s session.Stor
 		}
 
 		raw, err := ioutil.ReadAll(resp.Body)
-		fmt.Println(raw)
+		defer resp.Body.Close()
+		if err != nil {
+			ctx.Redirect(PathError)
+			return
+		}
+		var profile map[string]interface{}
+		if err = json.Unmarshal(raw, &profile); err != nil {
+			ctx.Redirect(PathError)
+			return
+		}
+		fmt.Println(profile)
 	}
 	// Store the credentials in the session.
 	val, _ := json.Marshal(t)
