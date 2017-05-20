@@ -30,7 +30,6 @@ import (
 	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/linkedin"
 	"io/ioutil"
-	"net/http"
 )
 
 const (
