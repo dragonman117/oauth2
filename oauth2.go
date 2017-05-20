@@ -29,6 +29,7 @@ import (
 	"golang.org/x/oauth2/github"
 	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/linkedin"
+	"io/ioutil"
 )
 
 const (
@@ -46,6 +47,10 @@ var (
 	PathCallback = "/oauth2callback"
 	// PathError is the path to handle error cases.
 	PathError = "/oauth2error"
+	//Is Auth0 config (bool to trigger oAuth extra code)
+	isAuth0 = false
+	//Auth0 domain (used for fetching the user info)
+	domain = ""
 )
 
 // Tokens represents a container that contains user's OAuth 2.0 access and refresh tokens.
@@ -109,6 +114,17 @@ func Facebook(conf *oauth2.Config) macaron.Handler {
 // LinkedIn returns a new LinkedIn OAuth 2.0 backend endpoint.
 func LinkedIn(conf *oauth2.Config) macaron.Handler {
 	conf.Endpoint = linkedin.Endpoint
+	return NewOAuth2Provider(conf)
+}
+
+// Auth 0  returns a new Auth0 OAuth 2.0 backend endpoint (will also put the user info into the session under user)
+func AuthZero(conf *oauth2.Config, yourDomain string) macaron.Handler {
+	domain = yourDomain
+	isAuth0 = true
+	conf.Endpoint = oauth2.Endpoint{
+		AuthURL:  "https://" + domain + "/authorize",
+		TokenURL: "https://" + domain + "/oauth/token",
+	}
 	return NewOAuth2Provider(conf)
 }
 
@@ -181,6 +197,18 @@ func handleOAuth2Callback(f *oauth2.Config, ctx *macaron.Context, s session.Stor
 		// error handler.
 		ctx.Redirect(PathError)
 		return
+	}
+	if isAuth0{
+		client := f.Client(oauth2.NoContext, t)
+		resp, err := client.Get("https://" + domain + "/userinfo")
+
+		if err != nil {
+			ctx.Redirect(PathError)
+			return
+		}
+
+		raw, err := ioutil.ReadAll(resp.Body)
+		fmt.Println(raw)
 	}
 	// Store the credentials in the session.
 	val, _ := json.Marshal(t)
