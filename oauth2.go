@@ -185,6 +185,7 @@ func login(f *oauth2.Config, ctx *macaron.Context, s session.Store) {
 func logout(ctx *macaron.Context, s session.Store) {
 	next := extractPath(ctx.Req.URL.Query().Get(KEY_NEXT_PAGE))
 	s.Delete(KEY_TOKEN)
+	s.Delete("user")
 	ctx.Redirect(next)
 }
 
@@ -219,8 +220,6 @@ func handleOAuth2Callback(f *oauth2.Config, ctx *macaron.Context, s session.Stor
 			return
 		}
 		s.Set("user", profile)
-		fmt.Println("Key:")
-		fmt.Println(s.Get("user"))
 	}
 	// Store the credentials in the session.
 	val, _ := json.Marshal(t)
