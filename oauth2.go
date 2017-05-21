@@ -185,7 +185,9 @@ func login(f *oauth2.Config, ctx *macaron.Context, s session.Store) {
 func logout(ctx *macaron.Context, s session.Store) {
 	next := extractPath(ctx.Req.URL.Query().Get(KEY_NEXT_PAGE))
 	s.Delete(KEY_TOKEN)
-	s.Delete("user")
+	if isAuth0{
+		s.Delete("user")
+	}
 	ctx.Redirect(next)
 }
 
