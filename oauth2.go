@@ -221,14 +221,7 @@ func handleOAuth2Callback(f *oauth2.Config, ctx *macaron.Context, s session.Stor
 			ctx.Redirect(PathError)
 			return
 		}
-		fmt.Println(profile["name"])
-		var tmp map[string]string
-		tmp["name"] = profile["name"].(string)
-		tmp["email"] = profile["email"].(string)
-		tmp["id"] = profile["user_id"].(string)
-		tmp["picture"] = profile["picture"].(string)
-		tmp["email_verified"] = profile["email_verified"].(string)
-		s.Set("user", tmp)
+		s.Set("user", profile)
 	}
 	// Store the credentials in the session.
 	val, _ := json.Marshal(t)
